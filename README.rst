@@ -1,9 +1,9 @@
 django-queued-storage
 =====================
 
-.. image:: https://secure.travis-ci.org/jezdez/django-queued-storage.png?branch=develop
+.. image:: https://secure.travis-ci.org/jannon/django-queued-storage.png?branch=master
     :alt: Build Status
-    :target: http://travis-ci.org/jezdez/django-queued-storage
+    :target: http://travis-ci.org/jannon/django-queued-storage
 
 This storage backend enables having a local and a remote storage
 backend. It will save any file locally and queue a task to transfer it
