@@ -1,11 +1,15 @@
-import urllib
+import six
 
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import SimpleLazyObject
+from django.utils.http import urlquote
 
 from queued_storage.conf import settings
-from queued_storage.utils import import_attribute
+from queued_storage.utils import import_attribute, django_version
+
+if django_version()[1] >= 7:
+    from django.utils.deconstruct import deconstructible
 
 
 class LazyBackend(SimpleLazyObject):
@@ -42,7 +46,7 @@ class QueuedStorage(object):
     #: The options of the local storage class, defined as a dictionary.
     local_options = None
 
-    #: The local storage class to use. A dotted path (e.g.
+    #: The remote storage class to use. A dotted path (e.g.
     #: ``'django.core.files.storage.FileSystemStorage'``).
     remote = None
 
@@ -58,7 +62,6 @@ class QueuedStorage(object):
     #: location automatically, but instead requires manual intervention by the
     #: user with the :meth:`~queued_storage.backends.QueuedStorage.transfer`
     #: method.
-    #:
     delayed = False
 
     #: The cache key prefix to use when saving the which storage backend
@@ -92,7 +95,7 @@ class QueuedStorage(object):
             raise ImproperlyConfigured("The QueuedStorage class '%s' "
                                        "doesn't define a needed backend." %
                                        (self, backend))
-        if not isinstance(backend, basestring):
+        if not isinstance(backend, six.string_types):
             raise ImproperlyConfigured("The QueuedStorage class '%s' "
                                        "requires its backends to be "
                                        "specified as dotted import paths "
@@ -126,7 +129,7 @@ class QueuedStorage(object):
         :type name: str
         :rtype: str
         """
-        return '%s_%s' % (self.cache_prefix, urllib.quote(name))
+        return '%s_%s' % (self.cache_prefix, urlquote(name))
 
     def using_local(self, name):
         """
@@ -322,6 +325,8 @@ class QueuedStorage(object):
         :rtype: :class:`~python:datetime.datetime`
         """
         return self.get_storage(name).modified_time(name)
+if django_version()[1] >= 7:
+    QueuedStorage = deconstructible(QueuedStorage)
 
 
 class QueuedFileSystemStorage(QueuedStorage):
