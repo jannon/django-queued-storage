@@ -9,7 +9,8 @@ DATABASES = {
 
 INSTALLED_APPS = [
     'queued_storage',
-    'queued_storage.tests',
+    'tests',
 ]
+
 
 SECRET_KEY = 'top_secret'
